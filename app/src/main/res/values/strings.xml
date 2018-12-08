@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">RoomWithAViewPaging</string>
+    <string name="add_button">ADD</string>
+    <string name="et_hint">Add a word…</string>
+    <string name="toast">Nothing was entered…</string>
+    <string name="clear_db">Clear Database</string>
+    <string name="add_words">Populate Database</string>
+    <string name="delete">DELETE</string>
+</resources>
