@@ -3,6 +3,7 @@ package org.nicknelson.roomwithaviewpaging;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.paging.PagedList;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class WordViewModel extends AndroidViewModel {
 
     private WordRepository mRepository;
 
-    private LiveData<List<WordEntity>> mAllWords;
+    private LiveData<PagedList<WordEntity>> mAllWords;
 
     public WordViewModel (Application application) {
         super(application);
@@ -18,7 +19,7 @@ public class WordViewModel extends AndroidViewModel {
         mAllWords = mRepository.getAllWords();
     }
 
-    LiveData<List<WordEntity>> getAllWords() {
+    LiveData<PagedList<WordEntity>> getAllWords() {
         return mAllWords;
     }
 

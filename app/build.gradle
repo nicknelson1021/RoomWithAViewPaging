@@ -36,4 +36,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     // SnackBar component
     implementation 'com.android.support:design:28.0.0'
+    // Paging component
+    implementation "android.arch.paging:runtime:1.0.0"
+
 }
