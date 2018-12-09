@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        editText.clearFocus();
         runLayoutAnimation(recyclerView);
     }
 
@@ -78,9 +80,11 @@ public class MainActivity extends AppCompatActivity
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
+        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+
         recyclerView.setAdapter(adapter);
         // add list divider
-        //recyclerView.addItemDecoration(itemDecor);
+        // recyclerView.addItemDecoration(itemDecor);
 
         Log.i(LOG_TAG,"Has Fixed Size: " + Boolean.toString(recyclerView.hasFixedSize()));
 
@@ -196,7 +200,7 @@ public class MainActivity extends AppCompatActivity
                 mWordViewModel.deleteAll();
                 break;
             case R.id.home_add:
-                addWords(500);
+                addWords(20);
                 break;
         }
 
@@ -272,7 +276,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public long getItemId(int position) {
             WordEntity current = getItem(position);
-            Log.i(LOG_TAG,"Item ID: " + Integer.toString(current.mWordId));
             return current.mWordId;
         }
 
@@ -283,7 +286,7 @@ public class MainActivity extends AppCompatActivity
             LinearLayout viewForeground;
 
             public void bindTo(WordEntity word) {
-                wordItemView.setText(word.mWord + "_" + Integer.toString(word.mWordId));
+                wordItemView.setText(word.mWord);
                 checkBox.setChecked(word.mIsSelected);
             }
 
