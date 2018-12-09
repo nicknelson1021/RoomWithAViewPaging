@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         adapter.notifyDataSetChanged();
         runLayoutAnimation(recyclerView);
-
     }
 
     @Override
