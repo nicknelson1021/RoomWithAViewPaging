@@ -4,6 +4,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 
 import java.util.Date;
 
@@ -53,5 +54,28 @@ public class WordEntity {
     boolean getIsSelected() { return mIsSelected; }
 
     void setIsSelected(@NonNull boolean isSelected) { this.mIsSelected = isSelected; }
+
+    public static DiffUtil.ItemCallback<WordEntity> DIFF_CALLBACK = new DiffUtil.ItemCallback<WordEntity>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull WordEntity oldItem, @NonNull WordEntity newItem) {
+            return oldItem.mWordId == newItem.mWordId;
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull WordEntity oldItem, @NonNull WordEntity newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+
+        WordEntity word = (WordEntity) obj;
+
+        return word.mWordId == this.mWordId && word.mWord.equals(this.mWord) &&
+                word.mIsSelected == this.mIsSelected && word.mCreateDate == this.mCreateDate;
+    }
 
 }

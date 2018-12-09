@@ -2,8 +2,11 @@ package org.nicknelson.roomwithaviewpaging;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.paging.PagedList;
+import android.arch.paging.PagedListAdapter;
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
@@ -30,15 +33,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Date;
-import java.util.List;
 
 import static android.graphics.drawable.ClipDrawable.HORIZONTAL;
 
 public class MainActivity extends AppCompatActivity
         implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
-
-    // TODO: Add paging to the app
-    // TODO: Remove checkbox transparent background and remove row selector so only cb is animated
 
     RecyclerView recyclerView;
     EditText editText;
@@ -54,7 +53,6 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         adapter.notifyDataSetChanged();
         runLayoutAnimation(recyclerView);
-
     }
 
     @Override
@@ -74,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         // instantiate RecyclerView divider
         itemDecor = new DividerItemDecoration(this, HORIZONTAL);
 
-        adapter = new WordListAdapter(this);
+        adapter = new WordListAdapter();
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -89,12 +87,16 @@ public class MainActivity extends AppCompatActivity
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
         mWordViewModel = ViewModelProviders.of(this).get(WordViewModel.class);
-        mWordViewModel.getAllWords().observe(this, new Observer<List<WordEntity>>() {
+        mWordViewModel.getAllWords().observe(this, new Observer<PagedList<WordEntity>>() {
             @Override
-            public void onChanged(@Nullable final List<WordEntity> words) {
+            public void onChanged(@Nullable final PagedList<WordEntity> words) {
                 // Update the cached copy of the words in the adapter.
-                adapter.setWords(words);
-                wordCount = words.size();
+                adapter.submitList(words);
+                if (words != null) {
+                    wordCount = words.size();
+                } else {
+                    wordCount = 0;
+                }
             }
         });
 
@@ -200,7 +202,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        final WordEntity word = adapter.mWords.get(position);
+
+        final WordEntity word = adapter.getCurrentList().get(position);
         mWordViewModel.delete(word);
 
         Snackbar snackbar = Snackbar
@@ -238,7 +241,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordViewHolder> {
+    public class WordListAdapter extends PagedListAdapter<WordEntity, WordListAdapter.WordViewHolder> {
 
         class WordViewHolder extends RecyclerView.ViewHolder {
 
@@ -257,10 +260,12 @@ public class MainActivity extends AppCompatActivity
                 viewForeground.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
-                        final WordEntity thisWord = mWords.get(getAdapterPosition());
-                        Toast.makeText(MainActivity.this,
-                                "You long-clicked: " + thisWord.getWord(),
-                                Toast.LENGTH_LONG).show();
+                        final WordEntity thisWord = getItem(getAdapterPosition());
+                        if (thisWord != null) {
+                            Toast.makeText(MainActivity.this,
+                                    "You long-clicked: " + thisWord.getWord(),
+                                    Toast.LENGTH_LONG).show();
+                        }
                         // returning false here will alow onClickListener to trigger as well
                         return true;
                     }
@@ -269,67 +274,42 @@ public class MainActivity extends AppCompatActivity
                 viewForeground.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final WordEntity thisWord = mWords.get(getAdapterPosition());
+                        final WordEntity thisWord = getItem(getAdapterPosition());
 
-                        if (thisWord.getIsSelected()) {
-                            thisWord.setIsSelected(false);
-                        } else {
-                            thisWord.setIsSelected(true);
+                        if (thisWord != null) {
+                            if (thisWord.getIsSelected()) {
+                                thisWord.setIsSelected(false);
+                            } else {
+                                thisWord.setIsSelected(true);
+                            }
+                            mWordViewModel.update(thisWord);
                         }
-                        mWordViewModel.update(thisWord);
                     }
                 });
             }
         }
 
-        private final LayoutInflater mInflater;
-        private List<WordEntity> mWords; // Cached copy of words
+        WordListAdapter() {
+            super(WordEntity.DIFF_CALLBACK);
+        }
 
-        WordListAdapter(Context context) { mInflater = LayoutInflater.from(context); }
-
+        @NonNull
         @Override
-        public WordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemView = mInflater.inflate(R.layout.recyclerview_item, parent, false);
+        public WordViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.recyclerview_item, parent, false);
             return new WordViewHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(WordViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull WordViewHolder holder, int position) {
 
-            /*
-            boolean animate = true;
-            // If the bound view wasn't previously displayed on screen, it's animated
-            if (animate) {
-                Animation animation = AnimationUtils.loadAnimation(MainActivity.this,
-                        android.R.anim.slide_in_left);
-                holder.itemView.startAnimation(animation);
-                animate = false;
-            }*/
+            WordEntity current = getItem(position);
 
-            if (mWords != null) {
-                final WordEntity current = mWords.get(position);
-
+            if (current != null) {
                 holder.wordItemView.setText(current.getWord());
                 holder.checkBox.setChecked(current.getIsSelected());
-            } else {
-                // Covers the case of data not being ready yet.
-                holder.wordItemView.setText("No Word");
-                holder.checkBox.setChecked(false);
             }
-        }
-
-        void setWords(List<WordEntity> words){
-            mWords = words;
-            notifyDataSetChanged();
-        }
-
-        // getItemCount() is called many times, and when it is first called,
-        // mWords has not been updated (means initially, it's null, and we can't return null).
-        @Override
-        public int getItemCount() {
-            if (mWords != null)
-                return mWords.size();
-            else return 0;
         }
     }
 }

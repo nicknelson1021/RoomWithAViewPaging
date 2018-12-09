@@ -2,6 +2,8 @@ package org.nicknelson.roomwithaviewpaging;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.arch.paging.LivePagedListBuilder;
+import android.arch.paging.PagedList;
 import android.os.AsyncTask;
 
 import java.util.List;
@@ -9,15 +11,23 @@ import java.util.List;
 public class WordRepository {
 
     private WordDao mWordDao;
-    private LiveData<List<WordEntity>> mAllWords;
+    private LiveData<PagedList<WordEntity>> mAllWords;
 
     WordRepository(Application application) {
+
         RoomDatabase db = RoomDatabase.getDatabase(application);
         mWordDao = db.wordDao();
-        mAllWords = mWordDao.getAllWords();
+
+        PagedList.Config pagedListConfig =
+                (new PagedList.Config.Builder()).setEnablePlaceholders(true)
+                        .setPrefetchDistance(20)
+                        .setPageSize(40).build();
+
+        mAllWords = new LivePagedListBuilder(mWordDao.getAllWords(), pagedListConfig).build();
+        // mAllWords = mWordDao.getAllWords();
     }
 
-    LiveData<List<WordEntity>> getAllWords() {
+    LiveData<PagedList<WordEntity>> getAllWords() {
         return mAllWords;
     }
 
