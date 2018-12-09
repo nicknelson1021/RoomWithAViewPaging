@@ -37,6 +37,6 @@ dependencies {
     // SnackBar component
     implementation 'com.android.support:design:28.0.0'
     // Paging component
-    implementation "android.arch.paging:runtime:1.0.0"
+    implementation "android.arch.paging:runtime:1.0.1"
 
 }

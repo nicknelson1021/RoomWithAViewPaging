@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/darker_gray"
     tools:context=".MainActivity">
 
     <android.support.v7.widget.RecyclerView
@@ -14,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layoutAnimation="@anim/layout_animation_from_bottom"
         android:background="@android:color/darker_gray"
+        android:layoutAnimation="@anim/layout_animation_from_bottom"
         tools:listitem="@layout/recyclerview_item" />
 
     <View

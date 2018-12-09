@@ -33,15 +33,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Date;
-import java.util.List;
 
 import static android.graphics.drawable.ClipDrawable.HORIZONTAL;
 
 public class MainActivity extends AppCompatActivity
         implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
-
-    // TODO: Add paging to the app
-    // TODO: Remove checkbox transparent background and remove row selector so only cb is animated
 
     RecyclerView recyclerView;
     EditText editText;

@@ -23,7 +23,7 @@ public class WordRepository {
                         .setPrefetchDistance(20)
                         .setPageSize(40).build();
 
-        mAllWords = (new LivePagedListBuilder(mWordDao.getAllWords(), pagedListConfig)).build();
+        mAllWords = new LivePagedListBuilder(mWordDao.getAllWords(), pagedListConfig).build();
         // mAllWords = mWordDao.getAllWords();
     }
 

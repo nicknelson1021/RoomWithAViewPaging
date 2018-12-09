@@ -74,7 +74,7 @@ public class WordEntity {
 
         WordEntity word = (WordEntity) obj;
 
-        return word.mWordId == this.mWordId && word.mWord == this.mWord &&
+        return word.mWordId == this.mWordId && word.mWord.equals(this.mWord) &&
                 word.mIsSelected == this.mIsSelected && word.mCreateDate == this.mCreateDate;
     }
 
