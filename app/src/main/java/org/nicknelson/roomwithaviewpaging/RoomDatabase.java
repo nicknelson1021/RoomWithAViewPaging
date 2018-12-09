@@ -64,7 +64,7 @@ public abstract class RoomDatabase extends android.arch.persistence.room.RoomDat
                 word.setCreateDate(new Date());
                 mDao.insert(word);
                 i++;
-            } while (i <= 500);
+            } while (i <= 20);
 
             return null;
         }

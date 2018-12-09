@@ -4,6 +4,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
 import java.util.Date;
@@ -13,16 +14,16 @@ import java.util.Date;
 public class WordEntity {
 
     @PrimaryKey(autoGenerate = true)
-    private int mWordId;
+    public int mWordId;
 
     @NonNull
-    private String mWord;
+    public String mWord;
 
     @NonNull
-    private Date mCreateDate;
+    public Date mCreateDate;
 
     @NonNull
-    private boolean mIsSelected;
+    public boolean mIsSelected;
 
     int getWordId() {
         return mWordId;
@@ -63,19 +64,11 @@ public class WordEntity {
 
         @Override
         public boolean areContentsTheSame(@NonNull WordEntity oldItem, @NonNull WordEntity newItem) {
-            return oldItem.equals(newItem);
+            return oldItem.mWordId == newItem.mWordId
+                    && oldItem.mIsSelected == newItem.mIsSelected
+                    && oldItem.mWord.equals(newItem.mWord)
+                    && oldItem.mCreateDate == newItem.mCreateDate;
+            //return oldItem == newItem;
         }
     };
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-
-        WordEntity word = (WordEntity) obj;
-
-        return word.mWordId == this.mWordId && word.mWord.equals(this.mWord) &&
-                word.mIsSelected == this.mIsSelected && word.mCreateDate == this.mCreateDate;
-    }
-
 }

@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,11 +48,11 @@ public class MainActivity extends AppCompatActivity
     DividerItemDecoration itemDecor;
     WordListAdapter adapter;
     LinearLayout mainLayout;
+    String LOG_TAG = "CLEAN_LOG";
 
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
         runLayoutAnimation(recyclerView);
     }
 
@@ -73,12 +74,15 @@ public class MainActivity extends AppCompatActivity
         itemDecor = new DividerItemDecoration(this, HORIZONTAL);
 
         adapter = new WordListAdapter();
+        Log.i(LOG_TAG,"Has Stable Ids: " + Boolean.toString(adapter.hasStableIds()));
 
-        recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapter);
         // add list divider
         //recyclerView.addItemDecoration(itemDecor);
+
+        Log.i(LOG_TAG,"Has Fixed Size: " + Boolean.toString(recyclerView.hasFixedSize()));
 
         // adding swipe-to-delete functionality
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback =
@@ -97,6 +101,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     wordCount = 0;
                 }
+                Log.i(LOG_TAG,"Word Count: " + Integer.toString(wordCount));
             }
         });
 
@@ -112,7 +117,6 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
-
     }
 
     private void runLayoutAnimation(final RecyclerView recyclerView) {
@@ -121,7 +125,6 @@ public class MainActivity extends AppCompatActivity
                 AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_from_bottom);
 
         recyclerView.setLayoutAnimation(controller);
-        recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
     }
 
@@ -243,11 +246,46 @@ public class MainActivity extends AppCompatActivity
 
     public class WordListAdapter extends PagedListAdapter<WordEntity, WordListAdapter.WordViewHolder> {
 
+        WordListAdapter() {
+            super(WordEntity.DIFF_CALLBACK);
+            setHasStableIds(true);
+        }
+
+        @NonNull
+        @Override
+        public WordViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.recyclerview_item, parent, false);
+            return new WordViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull WordViewHolder holder, int position) {
+
+            WordEntity current = getItem(position);
+
+            if (current != null) {
+                holder.bindTo(current);
+            }
+        }
+
+        @Override
+        public long getItemId(int position) {
+            WordEntity current = getItem(position);
+            Log.i(LOG_TAG,"Item ID: " + Integer.toString(current.mWordId));
+            return current.mWordId;
+        }
+
         class WordViewHolder extends RecyclerView.ViewHolder {
 
-            private final TextView wordItemView;
-            private final CheckBox checkBox;
-            public LinearLayout viewForeground;
+            TextView wordItemView;
+            CheckBox checkBox;
+            LinearLayout viewForeground;
+
+            public void bindTo(WordEntity word) {
+                wordItemView.setText(word.mWord + "_" + Integer.toString(word.mWordId));
+                checkBox.setChecked(word.mIsSelected);
+            }
 
             private WordViewHolder(View itemView) {
                 super(itemView);
@@ -286,29 +324,6 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 });
-            }
-        }
-
-        WordListAdapter() {
-            super(WordEntity.DIFF_CALLBACK);
-        }
-
-        @NonNull
-        @Override
-        public WordViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.recyclerview_item, parent, false);
-            return new WordViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull WordViewHolder holder, int position) {
-
-            WordEntity current = getItem(position);
-
-            if (current != null) {
-                holder.wordItemView.setText(current.getWord());
-                holder.checkBox.setChecked(current.getIsSelected());
             }
         }
     }
