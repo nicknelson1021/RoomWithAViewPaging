@@ -6,8 +6,6 @@ import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
 import android.os.AsyncTask;
 
-import java.util.List;
-
 public class WordRepository {
 
     private WordDao mWordDao;

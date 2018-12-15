@@ -5,8 +5,6 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.paging.PagedList;
 
-import java.util.List;
-
 public class WordViewModel extends AndroidViewModel {
 
     private WordRepository mRepository;

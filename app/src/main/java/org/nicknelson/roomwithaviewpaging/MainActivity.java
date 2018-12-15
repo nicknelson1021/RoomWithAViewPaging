@@ -12,7 +12,6 @@ import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -81,7 +80,9 @@ public class MainActivity extends AppCompatActivity
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
-        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        if (recyclerView.getItemAnimator() != null) {
+            ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        }
 
         recyclerView.setAdapter(adapter);
         // add list divider
@@ -211,8 +212,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
 
-        final WordEntity word = adapter.getCurrentList().get(position);
-        mWordViewModel.delete(word);
+        final WordEntity word;
+
+        if (adapter.getCurrentList() != null) {
+            word = adapter.getCurrentList().get(position);
+            mWordViewModel.delete(word);
+        } else {
+            word = null;
+        }
 
         Snackbar snackbar = Snackbar
                 .make(mainLayout, "Word deleted!", Snackbar.LENGTH_LONG);
@@ -221,7 +228,9 @@ public class MainActivity extends AppCompatActivity
         snackbar.setAction("UNDO", new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mWordViewModel.insert(word);
+                if (adapter.getCurrentList() != null) {
+                    mWordViewModel.insert(word);
+                }
             }
         });
 
