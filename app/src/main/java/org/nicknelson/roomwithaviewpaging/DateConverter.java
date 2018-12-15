@@ -4,7 +4,7 @@ import android.arch.persistence.room.TypeConverter;
 
 import java.util.Date;
 
-public class DateConverter {
+class DateConverter {
 
     @TypeConverter
     public Date fromTimestamp(Long value) {
@@ -15,5 +15,4 @@ public class DateConverter {
     public Long dateToTimestamp(Date date) {
         return date == null ? null : date.getTime();
     }
-
 }

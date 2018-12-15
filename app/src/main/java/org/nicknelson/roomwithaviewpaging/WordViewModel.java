@@ -5,8 +5,6 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.paging.PagedList;
 
-import java.util.List;
-
 public class WordViewModel extends AndroidViewModel {
 
     private WordRepository mRepository;
@@ -23,7 +21,7 @@ public class WordViewModel extends AndroidViewModel {
         return mAllWords;
     }
 
-    public void insert(WordEntity word) {
+    void insert(WordEntity word) {
         mRepository.insert(word);
     }
 
@@ -31,11 +29,11 @@ public class WordViewModel extends AndroidViewModel {
         mRepository.delete(word);
     }
 
-    public void update(WordEntity word) {
+    void update(WordEntity word) {
         mRepository.update(word);
     }
 
-    public void deleteAll() {
+    void deleteAll() {
         mRepository.deleteAll();
     }
 

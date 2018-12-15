@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 
 import java.util.Date;
 
-@Database(entities = {WordEntity.class}, version = 2)
+@Database(entities = {WordEntity.class}, version = 3)
 public abstract class RoomDatabase extends android.arch.persistence.room.RoomDatabase {
 
     public abstract WordDao wordDao();
