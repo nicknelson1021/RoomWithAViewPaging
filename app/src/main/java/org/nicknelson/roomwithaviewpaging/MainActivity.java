@@ -45,13 +45,12 @@ public class MainActivity extends AppCompatActivity
     RecyclerView recyclerView;
     EditText editText;
     Button button;
-    private static WordViewModel mWordViewModel;
+    WordViewModel mWordViewModel;
     int wordCount;
     DividerItemDecoration itemDecor;
     WordListAdapter adapter;
     LinearLayout mainLayout;
     String LOG_TAG = "CLEAN_LOG";
-    static Context context;
 
     @Override
     protected void onResume() {
@@ -73,8 +72,6 @@ public class MainActivity extends AppCompatActivity
         editText = findViewById(R.id.edit_text);
         button = findViewById(R.id.add_button);
         mainLayout = findViewById(R.id.main_layout);
-
-        context = getApplicationContext();
 
         // instantiate RecyclerView divider
         itemDecor = new DividerItemDecoration(this, HORIZONTAL);
@@ -102,7 +99,7 @@ public class MainActivity extends AppCompatActivity
         mWordViewModel.getAllWords().observe(this, new Observer<PagedList<WordEntity>>() {
             @Override
             public void onChanged(@Nullable final PagedList<WordEntity> words) {
-                // Update the cached copy of the words in the adapter.
+                Log.i("CLEAN_LOG","onChanged called...");
                 adapter.submitList(words);
                 if (words != null) {
                     wordCount = words.size();
@@ -252,10 +249,10 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public static class WordListAdapter extends PagedListAdapter<WordEntity, WordListAdapter.WordViewHolder> {
+    public class WordListAdapter extends PagedListAdapter<WordEntity, WordListAdapter.WordViewHolder> {
 
-        protected WordListAdapter() {
-            super(DIFF_CALLBACK);
+        WordListAdapter() {
+            super(WordEntity.DIFF_CALLBACK);
             setHasStableIds(true);
         }
 
@@ -277,31 +274,10 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        private static DiffUtil.ItemCallback<WordEntity> DIFF_CALLBACK =
-                new DiffUtil.ItemCallback<WordEntity>() {
-                    @Override
-                    public boolean areItemsTheSame(WordEntity oldItem, WordEntity newItem) {
-                        Log.i("CLEAN_LOG","areItemsTheSame: " +
-                                Boolean.toString(oldItem.getWordId()==newItem.getWordId()));
-                        return oldItem.getWordId() == newItem.getWordId();
-                    }
-
-                    @Override
-                    public boolean areContentsTheSame(WordEntity oldItem, WordEntity newItem) {
-                        Log.i("CLEAN_LOG","oldItem: " +
-                                Boolean.toString(oldItem.getIsSelected()));
-                        Log.i("CLEAN_LOG","newItem: " +
-                                Boolean.toString(newItem.getIsSelected()));
-                        Log.i("CLEAN_LOG","areContentsTheSame: " +
-                                Boolean.toString(oldItem.getIsSelected() == newItem.getIsSelected()));
-                        return oldItem.getIsSelected() == newItem.getIsSelected();
-                    }
-                };
-
         @Override
         public long getItemId(int position) {
             WordEntity current = getItem(position);
-            return current.mWordId;
+            return current != null ? current.mWordId : 0;
         }
 
         class WordViewHolder extends RecyclerView.ViewHolder {
@@ -310,7 +286,7 @@ public class MainActivity extends AppCompatActivity
             CheckBox checkBox;
             LinearLayout viewForeground;
 
-            public void bindTo(WordEntity word) {
+            void bindTo(WordEntity word) {
                 wordItemView.setText(word.mWord);
                 checkBox.setChecked(word.mIsSelected);
             }
@@ -328,7 +304,7 @@ public class MainActivity extends AppCompatActivity
                     public boolean onLongClick(View view) {
                         final WordEntity thisWord = getItem(getAdapterPosition());
                         if (thisWord != null) {
-                            Toast.makeText(context,
+                            Toast.makeText(MainActivity.this,
                                     "You long-clicked: " + thisWord.getWord(),
                                     Toast.LENGTH_LONG).show();
                         }

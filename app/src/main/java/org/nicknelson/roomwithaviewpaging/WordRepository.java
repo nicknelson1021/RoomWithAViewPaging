@@ -34,13 +34,13 @@ public class WordRepository {
     public void delete (WordEntity word) {
         new deleteAsyncTask(mWordDao).execute(word);
     }
-    public void update (WordEntity word) {
+    void update (WordEntity word) {
         new updateAsyncTask(mWordDao).execute(word);
     }
-    public void insert (WordEntity word) {
+    void insert (WordEntity word) {
         new insertAsyncTask(mWordDao).execute(word);
     }
-    public void deleteAll () { new WordRepository.deleteAllAsyncTask(mWordDao).execute(); }
+    void deleteAll () { new WordRepository.deleteAllAsyncTask(mWordDao).execute(); }
 
     private static class insertAsyncTask extends AsyncTask<WordEntity, Void, Void> {
         private WordDao mAsyncTaskDao;
