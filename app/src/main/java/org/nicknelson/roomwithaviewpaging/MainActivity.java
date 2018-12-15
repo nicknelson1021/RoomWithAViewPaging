@@ -12,6 +12,7 @@ import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,12 +45,13 @@ public class MainActivity extends AppCompatActivity
     RecyclerView recyclerView;
     EditText editText;
     Button button;
-    private WordViewModel mWordViewModel;
+    private static WordViewModel mWordViewModel;
     int wordCount;
     DividerItemDecoration itemDecor;
     WordListAdapter adapter;
     LinearLayout mainLayout;
     String LOG_TAG = "CLEAN_LOG";
+    static Context context;
 
     @Override
     protected void onResume() {
@@ -71,6 +73,8 @@ public class MainActivity extends AppCompatActivity
         editText = findViewById(R.id.edit_text);
         button = findViewById(R.id.add_button);
         mainLayout = findViewById(R.id.main_layout);
+
+        context = getApplicationContext();
 
         // instantiate RecyclerView divider
         itemDecor = new DividerItemDecoration(this, HORIZONTAL);
@@ -248,10 +252,10 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public class WordListAdapter extends PagedListAdapter<WordEntity, WordListAdapter.WordViewHolder> {
+    public static class WordListAdapter extends PagedListAdapter<WordEntity, WordListAdapter.WordViewHolder> {
 
-        WordListAdapter() {
-            super(WordEntity.DIFF_CALLBACK);
+        protected WordListAdapter() {
+            super(DIFF_CALLBACK);
             setHasStableIds(true);
         }
 
@@ -272,6 +276,27 @@ public class MainActivity extends AppCompatActivity
                 holder.bindTo(current);
             }
         }
+
+        private static DiffUtil.ItemCallback<WordEntity> DIFF_CALLBACK =
+                new DiffUtil.ItemCallback<WordEntity>() {
+                    @Override
+                    public boolean areItemsTheSame(WordEntity oldItem, WordEntity newItem) {
+                        Log.i("CLEAN_LOG","areItemsTheSame: " +
+                                Boolean.toString(oldItem.getWordId()==newItem.getWordId()));
+                        return oldItem.getWordId() == newItem.getWordId();
+                    }
+
+                    @Override
+                    public boolean areContentsTheSame(WordEntity oldItem, WordEntity newItem) {
+                        Log.i("CLEAN_LOG","oldItem: " +
+                                Boolean.toString(oldItem.getIsSelected()));
+                        Log.i("CLEAN_LOG","newItem: " +
+                                Boolean.toString(newItem.getIsSelected()));
+                        Log.i("CLEAN_LOG","areContentsTheSame: " +
+                                Boolean.toString(oldItem.getIsSelected() == newItem.getIsSelected()));
+                        return oldItem.getIsSelected() == newItem.getIsSelected();
+                    }
+                };
 
         @Override
         public long getItemId(int position) {
@@ -303,7 +328,7 @@ public class MainActivity extends AppCompatActivity
                     public boolean onLongClick(View view) {
                         final WordEntity thisWord = getItem(getAdapterPosition());
                         if (thisWord != null) {
-                            Toast.makeText(MainActivity.this,
+                            Toast.makeText(context,
                                     "You long-clicked: " + thisWord.getWord(),
                                     Toast.LENGTH_LONG).show();
                         }
